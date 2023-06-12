@@ -44,6 +44,7 @@ class UsersController {
         const { id } = request.params; 
         const user = await knex('users').select('*').where('id', id).first();
       
+      
         const updatedEmail = await knex('users').select('*').where('email', email).first();
       
         if (updatedEmail && updatedEmail.id !== user.id) {

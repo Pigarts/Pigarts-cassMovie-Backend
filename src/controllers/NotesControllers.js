@@ -29,8 +29,16 @@ class NotesController {
     }
 
     async update(request, response) {
-        const {title, description, rating, addTags } = request.body;
-        const {movie_note_id, user_id} = request.query;
+        const {title, description, rating } = request.body;
+        const {movie_note_id} = request.query;
+
+        const checkNoteExist = await knex("movie_notes").where("id", movie_note_id).first();
+
+        console.log(checkNoteExist)
+
+        if (!checkNoteExist) {
+            throw new AppError("Nota não encontrada.");
+        }
 
         const updateFields = {
             updated_at: knex.fn.now(),
