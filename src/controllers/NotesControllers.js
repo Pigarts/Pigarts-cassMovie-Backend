@@ -6,7 +6,7 @@ const AppError = require("../Utils/AppError")
 class NotesController {
     async create(request, response) {
     const {title, description, rating, tags } = request.body;
-    const {user_id} = request.params;
+    const user_id = request.user.id;
 
     const [movie_note_id] = await knex("movie_notes").insert({
         title,
@@ -64,14 +64,14 @@ class NotesController {
     }
 
     async delete(request, response) {
-        const {id} = request.params
+        const {id} = request.params;
         await knex("movie_notes").where({id}).delete();
         return response.json("Nota apagada.");
     }
 
     async index(request, response) {
-        const {title, user_id, tags } = request.query;
-
+        const {title, tags } = request.query;
+        const user_id = request.user.id;
         let notes
 
         if(tags) {
@@ -100,8 +100,9 @@ class NotesController {
                 ...note, tag:noteTags
             }
         });
-        console.log()
-        return response.json({ noteWithTags });
+        console.log(notes)
+
+        return response.json( noteWithTags );
     }
 }
 

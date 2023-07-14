@@ -41,8 +41,8 @@ class UsersController {
 
     async update(request, response) {
         const { name, email, password, old_password, avatar } = request.body;
-        const { id } = request.params; 
-        const user = await knex('users').select('*').where('id', id).first();
+        const  user_id  = request.user.id; 
+        const user = await knex('users').select('*').where('id', user_id).first();
       
       
         const updatedEmail = await knex('users').select('*').where('email', email).first();
@@ -72,14 +72,14 @@ class UsersController {
           ...(avatar && { avatar })
         };
       
-        await knex("users").update(updateFields).where("id", id);
+        await knex("users").update(updateFields).where("id", user_id);
         
         return response.status(200).json();
       }
 
     async delete(request, response) {
-        const {id} = request.params
-        await knex("users").where({id}).delete ();
+        const  user_id  = request.user.id; 
+        await knex("users").where({user_id}).delete ();
         return response.json("usuario deletado");
     }
     
