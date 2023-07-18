@@ -7,7 +7,7 @@ const sqliteConnection = require("../database/sqlite");
 
 class UsersController {
     async create(request, response) {
-        const {name, email, password, confirmPassword, avatar} = request.body;
+        const {name, email, password, avatar} = request.body;
         if(!name) {
             throw new AppError("nome é obrigatorio")
         }
@@ -25,10 +25,7 @@ class UsersController {
             throw new AppError("senha é obrigatoria")
         }
 
-        const confirmedPassword = password == confirmPassword
-        if(!confirmedPassword) {
-            throw new AppError("as senhas não conferem")
-        }
+       
         const hashedPassword = await hash(password,8);
 
         const user = {
@@ -44,7 +41,7 @@ class UsersController {
         const  user_id  = request.user.id; 
         const user = await knex('users').select('*').where('id', user_id).first();
       
-      
+    
         const updatedEmail = await knex('users').select('*').where('email', email).first();
       
         if (updatedEmail && updatedEmail.id !== user.id) {

@@ -15,16 +15,19 @@ class NotesController {
         user_id
     });
 
-    const tagsInsert = tags.map(name => {
-        return {
-            movie_note_id,
-            user_id,
-            name
-        }
-    });
+    if(tags && tags.length > 0) {
 
-    await knex("movie_tags").insert(tagsInsert);
-
+        const tagsInsert = tags.map(name => {
+            return {    
+                movie_note_id,
+                user_id,
+                name
+            }
+        });
+        
+        await knex("movie_tags").insert(tagsInsert);
+    }
+        
     response.json();
     }
 
@@ -70,40 +73,28 @@ class NotesController {
     }
 
     async index(request, response) {
-        const {title, tags } = request.query;
+        const {title } = request.query;
         const user_id = request.user.id;
+
         let notes
 
-        if(tags) {
-            const filterTags = tags.split(",").map(tag => tag.trim());
-            notes = await knex("movie_tags")
-            .select([
-             "movie_notes.id",
-             "movie_notes.title",
-             "movie_notes.user_id"])
-            .where("movie_notes.user_id", user_id)
-            .whereLike("movie_notes.title", `%${title}%`)
-            .whereIn("name", filterTags)
-            .innerJoin("movie_notes", "movie_notes.id", "movie_tags.movie_note_id")
-        }
-        else {
-            notes = await knex("movie_notes")
-            .where({ user_id })
-            .whereLike("title", `%${title}%`)
-            .orderBy("title");
-        }
-
+        notes = await knex("movie_notes")
+        .where({ user_id })
+        .whereLike("title", `%${title}%`)
+        .orderBy("title").groupBy("movie_notes.id")
+        
+        
+        
         const userTags = await knex("movie_tags").where({ user_id })
         const noteWithTags = notes.map(note => {
             const noteTags = userTags.filter(tag => tag.movie_note_id === note.id)
             return {
-                ...note, tag:noteTags
+                ...note, tags:noteTags
             }
         });
-        console.log(notes)
+        
 
         return response.json( noteWithTags );
     }
 }
-
 module.exports = NotesController
