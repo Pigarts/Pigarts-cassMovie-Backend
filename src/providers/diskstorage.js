@@ -4,6 +4,11 @@ const uploadsConfig = require("../configs/upload")
 
 class diskstorage {
     async savefile(file) {
+       
+
+        console.log("save")
+        
+
         await fs.promises.rename(
             path.resolve(uploadsConfig.TMP_FOLDER, file),
             path.resolve(uploadsConfig.UPLOADS_FOLDER, file)
